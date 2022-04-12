@@ -3,6 +3,7 @@ import { LoginParams, LoginResultModel, GetUserInfoModel } from './model/userMod
 
 import { ErrorMessageMode } from '/#/axios';
 import { buildUUID } from '/@/utils/uuid';
+import { ContentTypeEnum } from '/@/enums/httpEnum';
 
 enum Api {
   Login = '/api/auth/oauth/token',
@@ -35,6 +36,7 @@ export function loginApi(params: LoginParams, mode: ErrorMessageMode = 'modal') 
       },
       headers: {
         Authorization: 'Basic cGNmcm9udDpwY2Zyb250',
+        'Content-Type': ContentTypeEnum.FORM_DATA,
       },
     },
     {

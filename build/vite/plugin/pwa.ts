@@ -13,18 +13,6 @@ export function configPwaConfig(env: ViteEnv) {
       manifest: {
         name: VITE_GLOB_APP_TITLE,
         short_name: VITE_GLOB_APP_SHORT_NAME,
-        icons: [
-          {
-            src: './resource/img/pwa-192x192.png',
-            sizes: '192x192',
-            type: 'image/png',
-          },
-          {
-            src: './resource/img/pwa-512x512.png',
-            sizes: '512x512',
-            type: 'image/png',
-          },
-        ],
       },
     });
     return pwaPlugin;
