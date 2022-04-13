@@ -306,7 +306,7 @@ export function useDataSource(
       }
 
       if (afterFetch && isFunction(afterFetch)) {
-        resultItems = (await afterFetch(resultItems)) || resultItems;
+        resultItems = (await afterFetch(res)) || resultItems;
       }
       dataSourceRef.value = resultItems;
       setPagination({

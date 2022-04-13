@@ -1,9 +1,7 @@
 <template>
-  <div>
+  <PageWrapper :title="`钻孔` + gisBoreholeId + `的资料`" contentBackground @back="goBack">
     <BasicTable @register="registerTable" @selection-change="selectChange">
       <template #toolbar>
-        <a-button type="default"> 导入 </a-button>
-        <a-button type="primary" @click="handleCreate"> 新增 </a-button>
         <a-button type="danger" :disabled="selectCount === 0" @click="handleDelete">
           删除
         </a-button>
@@ -11,11 +9,11 @@
       <template #action="{ record }">
         <TableAction
           :actions="[
-            {
-              icon: 'clarity:info-standard-line',
-              tooltip: '查看钻孔详情',
-              onClick: handleView.bind(null, record),
-            },
+            // {
+            //   icon: 'clarity:info-standard-line',
+            //   tooltip: '查看钻孔详情',
+            //   onClick: handleView.bind(null, record),
+            // },
             {
               icon: 'clarity:note-edit-line',
               tooltip: '编辑钻孔资料',
@@ -34,51 +32,47 @@
         />
       </template>
     </BasicTable>
-    <DrillDrawer @register="registerDrawer" @success="handleSuccess" />
-  </div>
+    <DrillDetailsDrawer @register="registerDrawer" @success="handleSuccess" />
+  </PageWrapper>
 </template>
+
 <script lang="ts">
   import { defineComponent, ref } from 'vue';
-
   import { BasicTable, useTable, TableAction } from '/@/components/Table';
-  import { getDrillList, deleteDrill } from '/@/api/dataEdit/drilling';
+  import { deleteDrillDetails, getDrillDetailsList } from '/@/api/dataEdit/drilling';
 
   import { useDrawer } from '/@/components/Drawer';
-  import DrillDrawer from './DrillingDrawer.vue';
+  import DrillDetailsDrawer from './DrillDetailsDrawer.vue';
 
-  import { searchFormSchema } from './drilling.data';
-  import { useMessage } from '/@/hooks/web/useMessage';
+  import { useRoute } from 'vue-router';
+  import { PageWrapper } from '/@/components/Page';
   import { useGo } from '/@/hooks/web/usePage';
-
-  const { createMessage } = useMessage();
+  import { useMessage } from '/@/hooks/web/useMessage';
 
   export default defineComponent({
-    name: 'MenuManagement',
-    components: { BasicTable, DrillDrawer, TableAction },
+    name: 'DrillDetails',
+    components: { PageWrapper, BasicTable, DrillDetailsDrawer, TableAction },
     setup() {
+      const route = useRoute();
       const go = useGo();
       const selectCount = ref<number>(0);
+      const { createMessage } = useMessage();
       const [registerDrawer, { openDrawer }] = useDrawer();
-      const [registerTable, { reload, setColumns, getSelectRowKeys }] = useTable({
-        title: '钻孔列表',
-        api: getDrillList,
-        formConfig: {
-          labelWidth: 120,
-          schemas: searchFormSchema,
-        },
-        useSearchForm: true,
+      const [registerTable, { setColumns, getSelectRowKeys, reload }] = useTable({
+        api: getDrillDetailsList,
         showTableSetting: true,
         bordered: true,
         showIndexColumn: false,
         ellipsis: true,
         canResize: true,
-        rowKey: 'gisBoreholeId',
+        rowKey: 'gisGid',
         rowSelection: {
           type: 'checkbox',
         },
         tableSetting: {
           setting: false,
         },
+        beforeFetch,
         afterFetch,
         actionColumn: {
           width: 120,
@@ -88,6 +82,11 @@
           fixed: undefined,
         },
       });
+      const gisBoreholeId = route.params?.id;
+
+      function beforeFetch(params: any) {
+        params['id'] = gisBoreholeId;
+      }
 
       function afterFetch(res: any) {
         const { title = [], list = [] } = res?.data || {};
@@ -108,12 +107,6 @@
         selectCount.value = value?.keys?.length;
       }
 
-      function handleCreate() {
-        openDrawer(true, {
-          isUpdate: false,
-        });
-      }
-
       function handleEdit(record: Recordable) {
         openDrawer(true, {
           record,
@@ -121,33 +114,35 @@
         });
       }
 
-      function handleSuccess() {
-        reload();
-      }
-
-      function handleView(record: Recordable) {
-        go(`/dataEdit/drilling_detail/${record?.gisBoreholeId}`);
-      }
-
       async function handleDelete(record: Recordable) {
         const selectRowKeys = getSelectRowKeys();
-        if (selectRowKeys && Array.isArray(selectRowKeys)) await deleteDrill(selectRowKeys);
-        else await deleteDrill(record.gisBoreholeId);
+        if (selectRowKeys && Array.isArray(selectRowKeys)) await deleteDrillDetails(selectRowKeys);
+        else await deleteDrillDetails(record.gisBoreholeId);
         createMessage.success('删除成功!');
         handleSuccess();
       }
 
+      function handleSuccess() {
+        reload();
+      }
+
+      function goBack() {
+        go('/dataEdit/drilling');
+      }
+
       return {
+        gisBoreholeId,
+        goBack,
         registerTable,
         registerDrawer,
-        handleCreate,
         handleEdit,
-        handleDelete,
+        getSelectRowKeys,
         handleSuccess,
-        handleView,
+        handleDelete,
         selectChange,
         selectCount,
       };
     },
   });
 </script>
+<style></style>

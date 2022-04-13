@@ -13,12 +13,12 @@
 <script lang="ts">
   import { defineComponent, ref, computed, unref } from 'vue';
   import { BasicForm, useForm } from '/@/components/Form/index';
-  import { formSchema } from './drilling.data';
+  import { formSchema } from './drill_details.data';
   import { BasicDrawer, useDrawerInner } from '/@/components/Drawer';
-  import { createAndUpdateDrill } from '/@/api/dataEdit/drilling';
+  import { updateDrillDetails } from '/@/api/dataEdit/drilling';
 
   export default defineComponent({
-    name: 'MenuDrawer',
+    name: 'DrillDetailsDrawer',
     components: { BasicDrawer, BasicForm },
     emits: ['success', 'register'],
     setup(_, { emit }) {
@@ -49,9 +49,10 @@
         try {
           const values = await validate();
           setDrawerProps({ confirmLoading: true });
-          await createAndUpdateDrill(values);
+          await updateDrillDetails(values);
           closeDrawer();
           emit('success');
+          console.log('111');
         } finally {
           setDrawerProps({ confirmLoading: false });
         }

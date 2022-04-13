@@ -22,6 +22,18 @@ const dataEdit: AppRouteModule = {
       },
       component: () => import('/@/views/dataEdit/drilling/index.vue'),
     },
+    {
+      path: 'drilling_detail/:id',
+      name: 'DrillDetails111',
+      meta: {
+        hideMenu: true,
+        title: '钻孔数据详情',
+        ignoreKeepAlive: true,
+        showMenu: false,
+        currentActiveMenu: '/dataEdit/drilling',
+      },
+      component: () => import('/@/views/dataEdit/drilling/details/DrillDetails.vue'),
+    },
   ],
 };
 
